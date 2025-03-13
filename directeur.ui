@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>directeur</class>
+ <widget class="QDialog" name="directeur">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>730</width>
+    <height>577</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QPushButton" name="Gestion_employe">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>130</y>
+     <width>191</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"> background: #61A8EC;
+                        color : white; 
+
+			border-radius:10%;
+border : 3px #61A8EC;
+margin : 5px;
+</string>
+   </property>
+   <property name="text">
+    <string>Gestion Employe</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Gestion_enterprise">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>270</y>
+     <width>191</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"> background: #61A8EC;
+                        color : white; 
+
+			border-radius:10%;
+border : 3px #61A8EC;
+margin : 5px;
+</string>
+   </property>
+   <property name="text">
+    <string>Gestion Enterprise</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Gestion_incident">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>340</y>
+     <width>191</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"> background: #61A8EC;
+                        color : white; 
+
+			border-radius:10%;
+border : 3px #61A8EC;
+margin : 5px;
+</string>
+   </property>
+   <property name="text">
+    <string>Gestion Incident</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Gestion_audit">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>200</y>
+     <width>191</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"> background: #61A8EC;
+                        color : white; 
+
+			border-radius:10%;
+border : 3px #61A8EC;
+margin : 5px;
+</string>
+   </property>
+   <property name="text">
+    <string>Gestion Audit</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
