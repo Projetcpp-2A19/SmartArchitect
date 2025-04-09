@@ -24,13 +24,14 @@ private slots:
 
     void on_pushButton_8_clicked();
 
-    void on_pushButton_update_clicked();
 
     void on_pushButton_pdf_clicked();
 
     void on_pushButton_search_clicked();
 
     void on_pushButton_sort_clicked();
+
+    void on_pushButton_update_2_clicked();
 
 private:
     Ui::MainWindow *ui;

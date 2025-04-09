@@ -5,6 +5,13 @@
 #include <QSqlError>    // Required for lastError()
 #include <QDebug>        // Required for qDebug() to output errors
 
+#include <QSqlQuery>
+
+#include <QDialog>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QFormLayout>
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -29,43 +36,60 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_7_clicked()
 {
-    // Retrieve values from UI
-    QString nom = ui->lineEdit_nom->text();
-    QString prenom = ui->lineEdit_prenom->text();
-    QString telephoneStr = ui->lineEdit_telephone->text();
-    QString email = ui->lineEdit_email->text();
-    QString experience = ui->lineEdit_experience->text();
+    // Récupérer les valeurs depuis l'interface
+    QString nom = ui->lineEdit_nom->text().trimmed();
+    QString prenom = ui->lineEdit_prenom->text().trimmed();
+    QString telephoneStr = ui->lineEdit_telephone->text().trimmed();
+    QString email = ui->lineEdit_email->text().trimmed();
+    QString experience = ui->lineEdit_experience->text().trimmed();
 
-    // Validate telephone: should be exactly 8 digits
-    if (telephoneStr.length() != 8 || !telephoneStr.toInt()) {
+    // Contrôle de saisie : Nom et Prénom
+    QRegularExpression regexNomPrenom("^[A-Za-zÀ-ÿ\\s'-]+$");  // Lettres, espaces, accents, tirets
+    if (nom.isEmpty() || !regexNomPrenom.match(nom).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer un nom valide (lettres uniquement).");
+        return;
+    }
+
+    if (prenom.isEmpty() || !regexNomPrenom.match(prenom).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer un prénom valide (lettres uniquement).");
+        return;
+    }
+
+    // Contrôle de saisie : Téléphone (exactement 8 chiffres)
+    if (telephoneStr.length() != 8 || !telephoneStr.toUInt()) {
         QMessageBox::warning(this, "Erreur", "Le numéro de téléphone doit contenir exactement 8 chiffres.");
-        return;  // Stop the execution if validation fails
+        return;
     }
 
-    // Validate email: should contain '@'
-    if (!email.contains('@')) {
-        QMessageBox::warning(this, "Erreur", "L'adresse email doit contenir '@'.");
-        return;  // Stop the execution if validation fails
+    // Contrôle de saisie : Email
+    if (!email.contains('@') || !email.contains('.')) {
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer une adresse email valide.");
+        return;
     }
 
-    // Convert telephone string to integer for the architect object
+    // Contrôle de saisie : Expérience
+    if (experience.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer une expérience.");
+        return;
+    }
+
+    // Convertir téléphone
     int telephone = telephoneStr.toInt();
 
-    // Create architect object (ID is auto-incremented, so pass 0)
+    // Créer un objet architecte
     architecte unArchitecte(0, nom, prenom, telephone, email, experience);
 
-    // Try to insert the new architect
+    // Essayer d'ajouter à la base
     bool ajoutRéussi = unArchitecte.ajouter();
 
-    // Show success or failure message
     if (ajoutRéussi) {
-        // Refresh the table view after successful insertion
-        ui->tableView->setModel(Etmp.afficher());
+        ui->tableView->setModel(Etmp.afficher());  // Rafraîchir l'affichage
         QMessageBox::information(this, "Succès", "Architecte ajouté avec succès !");
     } else {
         QMessageBox::warning(this, "Erreur", "L'ajout de l'architecte a échoué.");
     }
 }
+
 
 
 
@@ -101,96 +125,6 @@ void MainWindow::on_pushButton_8_clicked()
 
 bool isUpdateMode = false;  // Flag to track whether we're in view or update mode
 
-void MainWindow::on_pushButton_update_clicked()
-{
-    int id = ui->lineEdit_update->text().toInt();
-
-    if (!isUpdateMode) {
-        // Check if the ID exists in the database
-        QSqlQuery query;
-        query.prepare("SELECT * FROM ARCHITECTES WHERE ID = :id");
-        query.bindValue(":id", id);
-        if (query.exec()) {
-            if (query.next()) {
-                // Populate the fields with the existing architect details
-                ui->lineEdit_nomu->setText(query.value("NOM").toString());
-                ui->lineEdit_prenomu->setText(query.value("PRENOM").toString());
-                ui->lineEdit_telephoneu->setText(QString::number(query.value("TELEPHONE").toInt()));
-                ui->lineEdit_emailu->setText(query.value("EMAIL").toString());
-                ui->lineEdit_experienceu->setText(query.value("EXPERIENCE").toString());
-
-                // Enable fields for update
-                ui->lineEdit_nomu->setEnabled(true);
-                ui->lineEdit_prenomu->setEnabled(true);
-                ui->lineEdit_telephoneu->setEnabled(true);
-                ui->lineEdit_emailu->setEnabled(true);
-                ui->lineEdit_experienceu->setEnabled(true);
-
-                // Change button text to "Mettre à jour"
-                ui->pushButton_update->setText("Mettre à jour");
-
-                QMessageBox::information(this, "Succès", "Architecte trouvé ! Vous pouvez maintenant mettre à jour.");
-                isUpdateMode = true;
-            } else {
-                QMessageBox::warning(this, "Erreur", "Aucun architecte trouvé avec cet ID.");
-            }
-        } else {
-            qDebug() << "Erreur de récupération des données : " << query.lastError().text();
-        }
-    } else {
-        // Retrieve values from UI for update
-        QString nom = ui->lineEdit_nomu->text();
-        QString prenom = ui->lineEdit_prenomu->text();
-        QString telephoneStr = ui->lineEdit_telephoneu->text();
-        QString email = ui->lineEdit_emailu->text();
-        QString experience = ui->lineEdit_experienceu->text();
-
-        // Validate telephone: should be exactly 8 digits
-        if (telephoneStr.length() != 8 || !telephoneStr.toInt()) {
-            QMessageBox::warning(this, "Erreur", "Le numéro de téléphone doit contenir exactement 8 chiffres.");
-            return;  // Stop the execution if validation fails
-        }
-
-        // Validate email: should contain '@'
-        if (!email.contains('@')) {
-            QMessageBox::warning(this, "Erreur", "L'adresse email doit contenir '@'.");
-            return;  // Stop the execution if validation fails
-        }
-
-        // Convert telephone string to integer
-        int telephone = telephoneStr.toInt();
-
-        // Update the architect in the database
-        QSqlQuery query;
-        query.prepare("UPDATE ARCHITECTES SET NOM = :nom, PRENOM = :prenom, TELEPHONE = :telephone, EMAIL = :email, EXPERIENCE = :experience WHERE ID = :id");
-
-        query.bindValue(":nom", nom);
-        query.bindValue(":prenom", prenom);
-        query.bindValue(":telephone", telephone);
-        query.bindValue(":email", email);
-        query.bindValue(":experience", experience);
-        query.bindValue(":id", id);
-
-        if (query.exec()) {
-            // Refresh the table view after update
-            ui->tableView->setModel(Etmp.afficher());
-
-            // Reset UI state
-            ui->lineEdit_nomu->setEnabled(false);
-            ui->lineEdit_prenomu->setEnabled(false);
-            ui->lineEdit_telephoneu->setEnabled(false);
-            ui->lineEdit_emailu->setEnabled(false);
-            ui->lineEdit_experienceu->setEnabled(false);
-            ui->pushButton_update->setText("Mettre à jour");
-
-            QMessageBox::information(this, "Succès", "Architecte mis à jour avec succès !");
-            isUpdateMode = false;
-        } else {
-            QMessageBox::warning(this, "Erreur", "La mise à jour a échoué.");
-        }
-    }
-}
-
 
 
 
@@ -224,4 +158,133 @@ void MainWindow::on_pushButton_sort_clicked()
     QSqlQueryModel* sortedModel = Etmp.trierParNom();
     ui->tableView->setModel(sortedModel);  // Display sorted results in the table view
 }
+void MainWindow::on_pushButton_update_2_clicked()
+{
+    QString idStr = ui->lineEdit_supprimer->text();
+    bool ok;
+    int id = idStr.toInt(&ok);
 
+    if (!ok || id <= 0) {
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer un ID valide.");
+        return;
+    }
+
+    QDialog updateDialog(this);
+    updateDialog.setWindowTitle("Mettre à jour l'architecte");
+
+    QLineEdit *lineEditNom = new QLineEdit(&updateDialog);
+    QLineEdit *lineEditPrenom = new QLineEdit(&updateDialog);
+    QLineEdit *lineEditTelephone = new QLineEdit(&updateDialog);
+    QLineEdit *lineEditEmail = new QLineEdit(&updateDialog);
+    QLineEdit *lineEditExperience = new QLineEdit(&updateDialog);
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM ARCHITECTES WHERE ID = :id");
+    query.bindValue(":id", id);
+    if (!(query.exec() && query.next())) {
+        QMessageBox::warning(this, "Erreur", "Impossible de charger les données.");
+        return;
+    }
+
+    QString oldNom = query.value("NOM").toString();
+    QString oldPrenom = query.value("PRENOM").toString();
+    QString oldTel = query.value("TELEPHONE").toString();
+    QString oldEmail = query.value("EMAIL").toString();
+    QString oldExp = query.value("EXPERIENCE").toString();
+
+    lineEditNom->setText(oldNom);
+    lineEditPrenom->setText(oldPrenom);
+    lineEditTelephone->setText(oldTel);
+    lineEditEmail->setText(oldEmail);
+    lineEditExperience->setText(oldExp);
+
+    QPushButton *updateButton = new QPushButton("Mettre à jour", &updateDialog);
+    QPushButton *cancelButton = new QPushButton("Annuler", &updateDialog);
+
+    QFormLayout *formLayout = new QFormLayout();
+    formLayout->addRow("Nom", lineEditNom);
+    formLayout->addRow("Prénom", lineEditPrenom);
+    formLayout->addRow("Téléphone", lineEditTelephone);
+    formLayout->addRow("Email", lineEditEmail);
+    formLayout->addRow("Expérience", lineEditExperience);
+    formLayout->addRow(updateButton, cancelButton);
+
+    updateDialog.setLayout(formLayout);
+
+    QObject::connect(updateButton, &QPushButton::clicked, this, [this, &updateDialog, id, lineEditNom, lineEditPrenom, lineEditTelephone, lineEditEmail, lineEditExperience, oldNom, oldPrenom, oldTel, oldEmail, oldExp]() {
+        QMap<QString, QVariant> updateFields;
+        QRegularExpression regexNomPrenom("^[A-Za-zÀ-ÿ\\s'-]+$");
+
+        QString newNom = lineEditNom->text().trimmed();
+        if (newNom != oldNom && !newNom.isEmpty()) {
+            if (!regexNomPrenom.match(newNom).hasMatch()) {
+                QMessageBox::warning(&updateDialog, "Erreur", "Nom invalide (lettres uniquement).");
+                return;
+            }
+            updateFields["NOM"] = newNom;
+        }
+
+        QString newPrenom = lineEditPrenom->text().trimmed();
+        if (newPrenom != oldPrenom && !newPrenom.isEmpty()) {
+            if (!regexNomPrenom.match(newPrenom).hasMatch()) {
+                QMessageBox::warning(&updateDialog, "Erreur", "Prénom invalide (lettres uniquement).");
+                return;
+            }
+            updateFields["PRENOM"] = newPrenom;
+        }
+
+        QString newTel = lineEditTelephone->text().trimmed();
+        if (newTel != oldTel && !newTel.isEmpty()) {
+            if (newTel.length() != 8 || !newTel.toUInt()) {
+                QMessageBox::warning(&updateDialog, "Erreur", "Téléphone invalide (8 chiffres).");
+                return;
+            }
+            updateFields["TELEPHONE"] = newTel;
+        }
+
+        QString newEmail = lineEditEmail->text().trimmed();
+        if (newEmail != oldEmail && !newEmail.isEmpty()) {
+            if (!newEmail.contains('@') || !newEmail.contains('.')) {
+                QMessageBox::warning(&updateDialog, "Erreur", "Email invalide.");
+                return;
+            }
+            updateFields["EMAIL"] = newEmail;
+        }
+
+        QString newExp = lineEditExperience->text().trimmed();
+        if (newExp != oldExp && !newExp.isEmpty()) {
+            updateFields["EXPERIENCE"] = newExp;
+        }
+
+        if (updateFields.isEmpty()) {
+            QMessageBox::information(&updateDialog, "Info", "Aucune modification détectée ou tous les champs sont vides.");
+            return;
+        }
+
+        QStringList setClauses;
+        QSqlQuery updateQuery;
+        for (auto it = updateFields.begin(); it != updateFields.end(); ++it) {
+            setClauses << QString("%1 = :%1").arg(it.key());
+        }
+
+        QString queryString = "UPDATE ARCHITECTES SET " + setClauses.join(", ") + " WHERE ID = :id";
+        updateQuery.prepare(queryString);
+
+        for (auto it = updateFields.begin(); it != updateFields.end(); ++it) {
+            updateQuery.bindValue(":" + it.key(), it.value());
+        }
+        updateQuery.bindValue(":id", id);
+
+        if (updateQuery.exec()) {
+            QMessageBox::information(&updateDialog, "Succès", "Mise à jour réussie !");
+            updateDialog.accept();
+            ui->tableView->setModel(Etmp.afficher());
+        } else {
+            QMessageBox::critical(&updateDialog, "Erreur", "Échec de la mise à jour.");
+        }
+    });
+
+    QObject::connect(cancelButton, &QPushButton::clicked, &updateDialog, &QDialog::reject);
+
+    updateDialog.exec();
+}
