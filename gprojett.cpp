@@ -1,13 +1,24 @@
 #include "gprojett.h"
 #include "ui_gprojett.h"
+#include "emailsender.h"
 #include <QMessageBox>
-
+#include <QTextDocument>
+#include <QTextCursor>
+#include <QTextTable>
+#include <QFileDialog>
+#include <QSqlQuery>
+#include <QTextCharFormat>
+#include <QSqlError>
 // 📌 Ajout des bibliothèques Qt Charts
 #include <QtCharts/QChartView>
 #include <QtCharts/QBarSet>
 #include <QtCharts/QBarSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QBarCategoryAxis>
+
+#include <QPdfWriter>
+#include <QPainter>
+
 
 GProjett::GProjett(QWidget *parent)
     : QMainWindow(parent)
@@ -26,6 +37,11 @@ GProjett::GProjett(QWidget *parent)
 
     ui->btnRechercher->setIcon(QIcon("C:/Users/benha/OneDrive/Bureau/GProjett/icon/search-13-48.ico"));
     ui->user_btn->setIcon(QIcon("C:/Users/benha/OneDrive/Bureau/GProjett/icon/user-48.ico"));
+
+    connect(ui->btnShowStats, &QPushButton::clicked, this, &GProjett::showBudgetGraph);
+    connect(ui->btnEnvoyerEmail, &QPushButton::clicked, this, &GProjett::envoyerNotificationEmailAvecPJ);
+    connect(ui->lineEditEmail, &QLineEdit::returnPressed, this, &GProjett::envoyerNotificationEmailAvecPJ);
+
 }
 
 GProjett::~GProjett()
@@ -72,7 +88,7 @@ void GProjett::on_btnAjouter_clicked() {
     if (p.ajouterProjet()) {
         QMessageBox::information(this, "Succès", "Projet ajouté !");
         proxyModel->setSourceModel(p.afficherProjets());  // Rafraîchir le modèle
-        showBudgetGraph();  // Rafraîchir le graphique
+
     } else {
         QMessageBox::warning(this, "Erreur", "Ajout échoué !");
     }
@@ -139,7 +155,7 @@ void GProjett::on_btnSupprimer_clicked() {
         if (p.supprimerProjet(id)) {
             QMessageBox::information(this, "Succès", "Projet supprimé !");
             proxyModel->setSourceModel(p.afficherProjets());  // Rafraîchir le modèle
-            showBudgetGraph();  // Rafraîchir le graphique
+              // Rafraîchir le graphique
         } else {
             QMessageBox::warning(this, "Erreur", "Suppression échouée !");
         }
@@ -164,36 +180,179 @@ void GProjett::on_btnRechercher_clicked()
     proxyModel->setFilterFixedString(searchText);
 }
 
-// 📊 Affichage du graphique Budget vs Dépenses
-void GProjett::showBudgetGraph()
+void GProjett::on_btnExporterPDF_clicked()
 {
-    QBarSet *budgetSet = new QBarSet("Budget Alloué");
-    QBarSet *spentSet = new QBarSet("Dépenses Actuelles");
+    QString fileName = QFileDialog::getSaveFileName(this, "Exporter en PDF", "", "PDF Files (*.pdf)");
+    if (fileName.isEmpty()) return;
 
-    *budgetSet << 50000;
-    *spentSet << 42000;
+    QPdfWriter writer(fileName);
+    writer.setPageSize(QPageSize(QPageSize::A4));
+    writer.setResolution(300);
+    writer.setPageMargins(QMarginsF(15, 15, 15, 15));
+
+    QPainter painter(&writer);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+
+    QTextDocument doc;
+    QRectF contentRect = writer.pageLayout().paintRectPixels(writer.resolution());
+    doc.setPageSize(contentRect.size());
+
+    QTextCursor cursor(&doc);
+
+    // Style du titre
+    QTextBlockFormat titleFormat;
+    titleFormat.setAlignment(Qt::AlignCenter);
+    titleFormat.setTopMargin(10);
+    titleFormat.setBottomMargin(20);
+
+    QTextCharFormat titleCharFormat;
+    titleCharFormat.setFont(QFont("Arial", 16, QFont::Bold));
+    titleCharFormat.setForeground(Qt::darkBlue);
+
+    cursor.insertBlock(titleFormat, titleCharFormat);
+    cursor.insertText("Liste des Projets");
+
+    // Configuration du tableau - maintenant avec 7 colonnes
+    QTextTableFormat tableFormat;
+    tableFormat.setBorder(1);
+    tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+    tableFormat.setCellPadding(6);
+    tableFormat.setCellSpacing(0);
+    tableFormat.setAlignment(Qt::AlignCenter);
+    tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 100));
+
+    // Largeurs des colonnes (ajustées pour 7 colonnes)
+    QVector<QTextLength> constraints;
+    constraints << QTextLength(QTextLength::PercentageLength, 7)   // ID
+                << QTextLength(QTextLength::PercentageLength, 15)  // Nom projet
+                << QTextLength(QTextLength::PercentageLength, 15)  // Nom client
+                << QTextLength(QTextLength::PercentageLength, 10)  // Budget
+                << QTextLength(QTextLength::PercentageLength, 18)  // Date Début
+                << QTextLength(QTextLength::PercentageLength, 18)  // Date Fin
+                << QTextLength(QTextLength::PercentageLength, 17); // Status
+    tableFormat.setColumnWidthConstraints(constraints);
+
+    // Créer le tableau avec 7 colonnes
+    QTextTable *table = cursor.insertTable(1, 7, tableFormat);
+
+    // Style des en-têtes
+    QTextCharFormat headerFormat;
+    headerFormat.setFont(QFont("Arial", 10, QFont::Bold));
+    headerFormat.setBackground(QColor(230, 230, 230));
+    headerFormat.setForeground(Qt::black);
+    headerFormat.setVerticalAlignment(QTextCharFormat::AlignMiddle);
+
+    // Ajouter les en-têtes (avec la nouvelle colonne)
+    QStringList headers = {"ID", "Nom Projet", "Nom Client", "Budget", "Date Début", "Date Fin", "Status"};
+    for (int i = 0; i < headers.size(); ++i) {
+        QTextTableCell cell = table->cellAt(0, i);
+        QTextCursor cellCursor = cell.firstCursorPosition();
+        cellCursor.insertText(headers[i], headerFormat);
+    }
+
+    // Style des cellules
+    QTextCharFormat cellFormat;
+    cellFormat.setFont(QFont("Arial", 9));
+    cellFormat.setVerticalAlignment(QTextCharFormat::AlignMiddle);
+
+    // Requête modifiée pour inclure le nom du client (jointure avec la table CLIENT)
+    QSqlQuery query;
+    query.prepare("SELECT p.ID_PROJET, p.NOM, c.NOM as NOM_CLIENT, p.BUDGET, "
+                  "p.DATE_DEBUT, p.DATE_FIN, p.STATUS "
+                  "FROM PROJET p "
+                  "LEFT JOIN CLIENT c ON p.ID_CLIENT = c.ID_CLIENT "
+                  "ORDER BY p.ID_PROJET");
+
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Erreur", "Impossible d'exécuter la requête: " + query.lastError().text());
+        return;
+    }
+
+    int rowsPerPage = 30; // Ajusté pour 7 colonnes
+
+    while (query.next()) {
+        if (table->rows() > rowsPerPage) {
+            writer.newPage();
+            table->appendRows(1);
+        }
+
+        table->appendRows(1);
+        for (int col = 0; col < 7; ++col) {
+            QTextTableCell cell = table->cellAt(table->rows()-1, col);
+            QTextCursor cellCursor = cell.firstCursorPosition();
+            cellCursor.insertText(query.value(col).toString(), cellFormat);
+        }
+    }
+
+    doc.drawContents(&painter);
+    QMessageBox::information(this, "Exportation réussie", "Le fichier PDF a été généré avec succès !");
+}
+
+
+// 📊 Affichage du graphique Budget vs Dépenses
+void GProjett::showBudgetGraph() {
+    QSqlQuery query("SELECT NOM, BUDGET FROM PROJET");
 
     QBarSeries *series = new QBarSeries();
-    series->append(budgetSet);
-    series->append(spentSet);
+
+    while (query.next()) {
+        QString nomProjet = query.value(0).toString();
+        double budget = query.value(1).toDouble();
+
+        QBarSet *set = new QBarSet(nomProjet);
+        *set << budget;
+        series->append(set);
+    }
 
     QChart *chart = new QChart();
     chart->addSeries(series);
-    chart->setTitle("Comparaison Budget vs Dépenses");
+    chart->setTitle("Statistiques des Budgets des Projets");
     chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    QStringList categories;
-    categories << "Projet A";
     QBarCategoryAxis *axisX = new QBarCategoryAxis();
-    axisX->append(categories);
+    axisX->append("Budgets");
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
 
     QValueAxis *axisY = new QValueAxis();
-    axisY->setRange(0, 60000);
+    axisY->setRange(0, 100000);  // Ajuste selon ton budget max
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
 
-    ui->chartWidget->setChart(chart);
-    ui->chartWidget->setRenderHint(QPainter::Antialiasing);
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setMinimumSize(600, 400);
+
+    chartView->show();
 }
+
+void GProjett::envoyerNotificationEmailAvecPJ() {
+    // Récupérer l'email depuis le QLineEdit
+    QString clientEmail = ui->lineEditEmail->text().trimmed();
+
+    QString message = "Bonjour,\n\nVeuillez trouver ci-joint le rapport de votre projet.\n\nCordialement.";
+
+    QString filePath = QFileDialog::getOpenFileName(this, "Choisir une pièce jointe", "", "PDF Files (*.pdf);;All Files (*)");
+    if (filePath.isEmpty()) return;
+
+    EmailSender email;
+    bool success = email.sendEmail(clientEmail, "Rapport de Projet", message, filePath);
+
+    if (success) {
+        QMessageBox::information(this, "Email", "Email avec pièce jointe envoyé avec succès !");
+        ui->lineEditEmail->clear(); // Optionnel: vider le champ après envoi
+    }
+    else {
+        QMessageBox::warning(this, "Email", "Erreur lors de l'envoi de l'email.");
+    }
+}
+
+
+
+
+
+
+
+
+

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1384</width>
-    <height>700</height>
+    <height>701</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
       <x>180</x>
       <y>50</y>
       <width>1211</width>
-      <height>761</height>
+      <height>861</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -111,7 +111,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <string>Mail ou numero de telephone:</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="lineEditEmail">
        <property name="geometry">
         <rect>
          <x>172</x>
@@ -131,7 +131,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </rect>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_6">
+      <widget class="QPushButton" name="btnEnvoyerEmail">
        <property name="geometry">
         <rect>
          <x>310</x>
@@ -471,7 +471,7 @@ QComboBox::drop-down {
 }
 
 QComboBox::down-arrow {
-    image: url(C:/Users/benha/OneDrive/Bureau/GProjett/icon/down1.png); /* Remplace par ton icône */
+    image: url(C:/Users/FK Info/Desktop/GProjett/icon/down1.png); /* Remplace par ton icône */
     width: 12px;
     height: 12px;
 }
@@ -564,13 +564,13 @@ QDateEdit::up-button:hover, QDateEdit::down-button:hover {
 }
 
 QDateEdit::up-arrow {
-    image: url(C:/Users/benha/OneDrive/Bureau/GProjett/icon/down.png); /* Remplace par ton icône */
+    image: url(C:/Users/FK Info/Desktop/GProjett/icon/down.png); /* Remplace par ton icône */
     width: 10px;
     height: 10px;
 }
 
 QDateEdit::down-arrow {
-    image: url(C:/Users/benha/OneDrive/Bureau/GProjett/icon/down1.png); /* Remplace par ton icône */
+    image: url(C:/Users/FK Info/Desktop/GProjett/icon/down1.png); /* Remplace par ton icône */
     width: 10px;
     height: 10px;
 }
@@ -631,13 +631,13 @@ QDateEdit::up-button:hover, QDateEdit::down-button:hover {
 }
 
 QDateEdit::up-arrow {
-    image: url(C:/Users/benha/OneDrive/Bureau/GProjett/icon/down.png); /* Remplace par ton icône */
+    image: url(C:/Users/FK Info/Desktop/GProjett/icon/down.png); /* Remplace par ton icône */
     width: 10px;
     height: 10px;
 }
 
 QDateEdit::down-arrow {
-    image: url(C:/Users/benha/OneDrive/Bureau/GProjett/icon/down1.png); /* Remplace par ton icône */
+    image: url(C:/Users/FK Info/Desktop/GProjett/icon/down1.png); /* Remplace par ton icône */
     width: 10px;
     height: 10px;
 }
@@ -691,9 +691,9 @@ QDateEdit::down-arrow {
       <property name="geometry">
        <rect>
         <x>760</x>
-        <y>330</y>
+        <y>70</y>
         <width>421</width>
-        <height>311</height>
+        <height>331</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -955,22 +955,12 @@ border-radius:15px;
        </item>
       </layout>
      </widget>
-     <widget class="QChartView" name="chartWidget" native="true">
-      <property name="geometry">
-       <rect>
-        <x>780</x>
-        <y>70</y>
-        <width>411</width>
-        <height>251</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QTableView" name="tableView">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>410</y>
-        <width>741</width>
+        <width>751</width>
         <height>231</height>
        </rect>
       </property>
@@ -1084,7 +1074,7 @@ QPushButton:default {
      <widget class="QPushButton" name="btnDesc">
       <property name="geometry">
        <rect>
-        <x>480</x>
+        <x>530</x>
         <y>380</y>
         <width>84</width>
         <height>24</height>
@@ -1120,7 +1110,7 @@ QPushButton:default {
      <widget class="QPushButton" name="btnAsc">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>430</x>
         <y>380</y>
         <width>84</width>
         <height>24</height>
@@ -1151,6 +1141,55 @@ QPushButton:default {
       </property>
       <property name="text">
        <string>ASC</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnExporterPDF">
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>340</y>
+        <width>101</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    border: 2px solid #8f8f91;
+    border-radius: 6px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #f6f7fa, stop: 1 #dadbde);
+    min-width: 80px;
+}
+
+QPushButton:pressed {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #dadbde, stop: 1 #f6f7fa);
+}
+
+QPushButton:flat {
+    border: none; /* no border for a flat push button */
+}
+
+QPushButton:default {
+    border-color: navy; /* make the default button prominent */
+}
+</string>
+      </property>
+      <property name="text">
+       <string>Exportation PDF</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnShowStats">
+      <property name="geometry">
+       <rect>
+        <x>870</x>
+        <y>490</y>
+        <width>241</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Statistique</string>
       </property>
      </widget>
     </widget>
@@ -2028,14 +2067,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </widget>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QChartView</class>
-   <extends>QWidget</extends>
-   <header>qchartview.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

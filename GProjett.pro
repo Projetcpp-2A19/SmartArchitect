@@ -1,6 +1,8 @@
 QT       += core gui
 QT += charts
 QT +=sql
+QT += core gui widgets network
+QT += networkauth
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
@@ -11,12 +13,14 @@ CONFIG += c++17
 
 SOURCES += \
     connexion.cpp \
+    emailsender.cpp \
     main.cpp \
     gprojett.cpp \
     projetmanager.cpp
 
 HEADERS += \
     connexion.h \
+    emailsender.h \
     gprojett.h \
     projetmanager.h
 

@@ -28,6 +28,8 @@ private slots:
     void on_btnAsc_clicked();  // Trier en ordre ascendant
     void on_btnDesc_clicked(); // Trier en ordre descendant
     void on_btnRechercher_clicked();
+    void on_btnExporterPDF_clicked();
+    void envoyerNotificationEmailAvecPJ();
 
 private:
     Ui::GProjett *ui;

@@ -18,7 +18,7 @@ ProjetManager::ProjetManager(int id, QString nom, double budget, QString debut, 
 // Ajouter un projet
 bool ProjetManager::ajouterProjet() {
     QSqlQuery query;
-    query.prepare("INSERT INTO PROJETS (NOM, BUDGET, DATE_DEBUT, DATE_FIN, ID_CLIENT, STATUS) "
+    query.prepare("INSERT INTO PROJET (NOM, BUDGET, DATE_DEBUT, DATE_FIN, ID_CLIENT, STATUS) "
                   "VALUES (:nom, :budget, TO_DATE(:date_debut, 'YYYY-MM-DD'), TO_DATE(:date_fin, 'YYYY-MM-DD'), :id_client, :status)");
     query.bindValue(":nom", nom);
     query.bindValue(":budget", budget);
@@ -33,14 +33,14 @@ bool ProjetManager::ajouterProjet() {
 // Afficher les projets
 QSqlQueryModel *ProjetManager::afficherProjets() {
     QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery("SELECT * FROM PROJETS");
+    model->setQuery("SELECT * FROM PROJET");
     return model;
 }
 
 // Modifier un projet
 bool ProjetManager::modifierProjet() {
     QSqlQuery query;
-    query.prepare("UPDATE PROJETS SET NOM=:nom, BUDGET=:budget, DATE_DEBUT=TO_DATE(:date_debut, 'YYYY-MM-DD'), DATE_FIN=TO_DATE(:date_fin, 'YYYY-MM-DD'), "
+    query.prepare("UPDATE PROJET SET NOM=:nom, BUDGET=:budget, DATE_DEBUT=TO_DATE(:date_debut, 'YYYY-MM-DD'), DATE_FIN=TO_DATE(:date_fin, 'YYYY-MM-DD'), "
                   "ID_CLIENT=:id_client, STATUS=:status WHERE ID_PROJET=:id");
     query.bindValue(":id", id_projet);
     query.bindValue(":nom", nom);
@@ -56,7 +56,7 @@ bool ProjetManager::modifierProjet() {
 // Supprimer un projet
 bool ProjetManager::supprimerProjet(int id) {
     QSqlQuery query;
-    query.prepare("DELETE FROM PROJETS WHERE ID_PROJET=:id");
+    query.prepare("DELETE FROM PROJET WHERE ID_PROJET=:id");
     query.bindValue(":id", id);
     return query.exec();
 }
