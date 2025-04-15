@@ -16,13 +16,13 @@ public:     //méthodes de la classe Arduino
     QSerialPort* getserial();   // accesseur
     QString getarduino_port_name();
 private:
-QSerialPort * serial; //Cet objet rassemble des informations (vitesse, bits de données, etc.)
-//et des fonctions (envoi, lecture de réception,…) sur ce qu’est une voie série pour Arduino.
-static const quint16 arduino_uno_vendor_id=9025; // ali : 6790  //nabil :9025
-static const quint16 arduino_uno_producy_id=67;  //ali : 29987  //nabil : 67
-QString arduino_port_name;
-bool arduino_is_available;
-QByteArray data;  // contenant les données lues à partir d'Arduino
+    QSerialPort * serial; //Cet objet rassemble des informations (vitesse, bits de données, etc.)
+    //et des fonctions (envoi, lecture de réception,…) sur ce qu’est une voie série pour Arduino.
+    static const quint16 arduino_uno_vendor_id=9025; // ali : 6790  //nabil :9025
+    static const quint16 arduino_uno_producy_id=67;  //ali : 29987  //nabil : 67
+    QString arduino_port_name;
+    bool arduino_is_available;
+    QByteArray data;  // contenant les données lues à partir d'Arduino
 };
 
 

@@ -4,7 +4,7 @@
 #include <QString>
 #include <QSqlQueryModel>
 #include <QTableWidget>
-
+#include <QMap>
 class Client
 {
 public:
@@ -19,7 +19,7 @@ public:
     QString getRegion() const { return region; }
     QString getTelephone() const { return telephone; }
     QString getEmail() const { return email; }
-
+    QString getLastError() const;
     // Setters
     void setId(int id) { this->id = id; }
     void setNom(const QString &nom) { this->nom = nom; }
@@ -28,19 +28,28 @@ public:
     void setTelephone(const QString &telephone) { this->telephone = telephone; }
     void setEmail(const QString &email) { this->email = email; }
 
-    // CRUD
+    // CRUD Operations
     bool ajouter();
     bool modifier(int id);
     bool supprimer(int id);
     QSqlQueryModel *afficher();
     Client recupererClient(int id);
+    QSqlQueryModel *chercherParNom(QString nom);
+    bool exporterPDF(const QString &filePath);
+    void afficherTrieDansTableWidget(QTableWidget *tableWidget, bool ascending);
+    QMap<QString, int> getStatsByRegion();
 
-    // Affichage tableWidget
+    // Affichage
     void afficherDansTableWidget(QTableWidget *tableWidget);
 
 private:
-    int id;
-    QString nom, prenom, region, telephone, email;
+    int id = 0;
+    QString nom;
+    QString prenom;
+    QString region;
+    QString telephone;
+    QString email;
+    QString lastError;
 };
 
 #endif // CLIENT_H
