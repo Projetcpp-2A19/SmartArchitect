@@ -1,0 +1,14 @@
+release/connexion.o
+release/emailsender.o
+release/employee.o
+release/login.o
+release/loginform.o
+release/main.o
+release/mainwindow.o
+release/passwordresetform.o
+release/statspostewindow.o
+release/moc_emailsender.o
+release/moc_loginform.o
+release/moc_mainwindow.o
+release/moc_passwordresetform.o
+release/moc_statspostewindow.o
