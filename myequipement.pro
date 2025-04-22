@@ -7,6 +7,11 @@ CONFIG +=QMAKE_LFLAGS_CONSOLE
 CONFIG +=QMAKE_LFLAGS_CONSOLE_DLL
 CONFIG +=QMAKE_LIBS_CONSOLE
 QT+=sql
+QT += core gui network
+QT += network
+QT += printsupport
+QT += core gui texttospeech
+
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -15,6 +20,7 @@ QT+=sql
 SOURCES += \
     ajouterarchitecte.cpp \
     chatbot.cpp \
+    codebarres.cpp \
     connection.cpp \
     equipement.cpp \
     findarchitecte.cpp \
@@ -27,6 +33,7 @@ SOURCES += \
 HEADERS += \
     ajouterarchitecte.h \
     chatbot.h \
+    codebarres.h \
     connection.h \
     equipement.h \
     findarchitecte.h \

@@ -7,6 +7,11 @@
 #include "supprimerarchitecte.h"
 #include "updatearchitecte.h"
 #include "chatbot.h"
+#include <QFileDialog>
+#include <QPdfWriter>
+#include <QPainter>
+#include <QTextDocument>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -40,6 +45,15 @@ private slots:
 
     void on_pushButton_modifier_clicked();
 
+    void on_pushButton_trouver_clicked();
+    void on_commandLinkButton_chatbot_clicked();
+
+
+    void exporterPDF();
+
+
+    void on_pushButton_trier_clicked();
+
 private:
     Ui::MainWindow *ui;
     AjouterArchitecte *ptrAjouterArchitecte;
@@ -47,6 +61,11 @@ private:
     SupprimerArchitecte *ptrSupprimerArchitecte;
     UpdateArchitecte *ptrUpdateArchitecte;
     chatbot *ptrchatbot;
+    bool eventFilter(QObject* obj, QEvent* event) override;
+    void afficherCodeBarreZoom(QPixmap pixmap);  // La fonction qu'on appelle
+    QMap<QString, QPixmap> barcodeCache;
+
+
 
 
 
