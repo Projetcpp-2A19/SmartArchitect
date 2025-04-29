@@ -83,13 +83,10 @@ bool equipement::ajouter() {
     QSqlQuery query;
 
     // Générer le contenu du code-barres (exemple : nom + type)
-    QString contenu_code = QString("NOM=%1/QTE=%2/TYPE=%3/DATE=%4/BUDGET=%5/CARAC=%6")
-                               .arg(nom)
-                               .arg(quantite)
-                               .arg(type)
-                               .arg(datedachat.toString("ddMMyyyy"))
-                               .arg(budget)
-                               .arg(caracteristiques);
+    QString contenu_code = QString("NOM-=%1/%2")
+                               .arg(nom.left(10))
+                               .arg(type.left(5))
+        ;
 
     // Nettoyage : enlever accents, mettre en majuscules, retirer caractères non autorisés
     contenu_code = contenu_code.toUpper();

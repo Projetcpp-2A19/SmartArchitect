@@ -11,6 +11,8 @@ QT += core gui network
 QT += network
 QT += printsupport
 QT += core gui texttospeech
+QT += serialport
+
 
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -18,38 +20,40 @@ QT += core gui texttospeech
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    ajouterarchitecte.cpp \
+    #ajouterarchitecte.cpp \
+    arduino.cpp \
     chatbot.cpp \
     codebarres.cpp \
     connection.cpp \
     equipement.cpp \
-    findarchitecte.cpp \
+    #findarchitecte.cpp \
     main.cpp \
     mainwindow.cpp \
-    supprimerarchitecte.cpp \
-    trouverarchitecte.cpp \
-    updatearchitecte.cpp
+    #supprimerarchitecte.cpp \
+    #trouverarchitecte.cpp \
+    #updatearchitecte.cpp
 
 HEADERS += \
-    ajouterarchitecte.h \
+    #ajouterarchitecte.h \
+    arduino.h \
     chatbot.h \
     codebarres.h \
     connection.h \
     equipement.h \
-    findarchitecte.h \
+    #findarchitecte.h \
     mainwindow.h \
-    supprimerarchitecte.h \
-    trouverarchitecte.h \
-    updatearchitecte.h
+    #supprimerarchitecte.h \
+    #trouverarchitecte.h \
+    #updatearchitecte.h
 
 FORMS += \
-    ajouterarchitecte.ui \
+    #ajouterarchitecte.ui \
     chatbot.ui \
-    findarchitecte.ui \
+    #findarchitecte.ui \
     mainwindow.ui \
-    supprimerarchitecte.ui \
-    trouverarchitecte.ui \
-    updatearchitecte.ui
+    #supprimerarchitecte.ui \
+    #trouverarchitecte.ui \
+    #updatearchitecte.ui
 
 TRANSLATIONS += \
     myequipement_fr_FR.ts

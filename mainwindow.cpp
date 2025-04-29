@@ -30,15 +30,22 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ptrAjouterArchitecte = new AjouterArchitecte();
-    ptrSupprimerArchitecte = new SupprimerArchitecte();
-    ptrFindArchitecte = new FindArchitecte ();
-    ptrUpdateArchitecte= new UpdateArchitecte();
+
     ptrchatbot= new chatbot();
     connect(ui->pushButton_ajouter, &QPushButton::clicked, this, &MainWindow::on_pushButton_ajouter_clicked);
     connect(ui->pushButton_Afficher, &QPushButton::clicked, this, &MainWindow::on_pushButton_Afficher_clicked);
     connect(ui->exporter, &QPushButton::clicked, this, &MainWindow::exporterPDF);
     connect(ui->pushButton_trier, &QPushButton::clicked, this, &MainWindow::on_pushButton_trier_clicked);
+    arduino = new Arduino(this);  // <-- crée ton objet arduino
+
+    if (arduino->connectArduino() == 0) {
+        qDebug() << "Arduino connecté.";
+    } else {
+        qDebug() << "Échec de connexion Arduino.";
+    }
+
+    connect(arduino, &Arduino::idReceived, this, &MainWindow::onIdReceived);
+
 
 
 
@@ -46,28 +53,28 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete ptrAjouterArchitecte;
-    delete ptrFindArchitecte;
-    delete ptrSupprimerArchitecte;
-    delete ptrUpdateArchitecte;
+
     delete ptrchatbot;
     delete ui;
 }
 
+
 void MainWindow::on_pushButton_2_clicked()
 {
-    ptrUpdateArchitecte->show();
+    // Ton code ici, même si c'est vide pour l'instant
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    ptrSupprimerArchitecte->show();
+    // Ton code ici
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    ptrFindArchitecte->show();
+    // Ton code ici
 }
+
+
 
 
 
@@ -517,6 +524,31 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event) {
     }
     return false;
 }
+void MainWindow::onIdReceived(const QString &id)
+{
+    qDebug() << "ID reçu depuis Arduino :" << id;
+
+    QString cleanedId = id;
+    cleanedId = cleanedId.trimmed();
+    cleanedId = cleanedId.remove("ID saisi : ");  // enlever le texte inutile
+
+    qDebug() << "ID nettoyé :" << cleanedId;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM EQUIPEMENT WHERE ID_EQUIPEMENT = :id");
+    query.bindValue(":id", cleanedId.toInt()); // ici on convertit bien en INT pour Oracle
+
+    if (query.exec()) {
+        if (query.next()) {
+            QMessageBox::information(this, "Résultat", "L'équipement de l'id: " +cleanedId  + " existe dans la liste des equipements.");
+        } else {
+            QMessageBox::warning(this, "Erreur", "ID non trouvé dans la liste des equipements !");
+        }
+    } else {
+        qDebug() << "Erreur SQL :" << query.lastError().text();
+    }
+}
+
 
 
 
