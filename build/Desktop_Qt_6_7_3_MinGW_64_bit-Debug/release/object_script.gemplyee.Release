@@ -1,0 +1,12 @@
+release/connection.o
+release/employee.o
+release/login.o
+release/loginform.o
+release/main.o
+release/mainwindow.o
+release/serialhandler.o
+release/statspostewindow.o
+release/moc_loginform.o
+release/moc_mainwindow.o
+release/moc_serialhandler.o
+release/moc_statspostewindow.o
